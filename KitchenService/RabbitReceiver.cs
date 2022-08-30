@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.SignalR;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Framing.Impl;
 using Steeltoe.Messaging.RabbitMQ.Attributes;
 using Steeltoe.Messaging.RabbitMQ.Core;
 using System.Text;
@@ -18,11 +19,11 @@ namespace KitchenService
         public RabbitReceiver(
             RabbitMqSettings rabbitSettings,
             IHubContext<OrderHub> hub,
-            IModel channel,
+            //IModel channel,
             RabbitTemplate template)
         {
             _rabbitSettings = rabbitSettings;
-            _channel = channel;
+            //_channel = channel;
             _orderHub = hub;
             _template = template;
         }
@@ -46,30 +47,31 @@ namespace KitchenService
         //    var order = JsonSerializer.Deserialize<Order>(input);
         //    await _orderHub.Clients.All.SendAsync("new-order", order);
         //}
+        [RabbitListener(Binding = "waffle.binding")]
         private void DoStuff()
         {
+            Console.WriteLine("Success");
+            //_channel.QueueBind(queue: _rabbitSettings.QueueName,
+            //                  exchange: _rabbitSettings.ExchangeName,
+            //                  routingKey: _rabbitSettings.RoutingKey);
+            
 
-            _channel.QueueBind(queue: _rabbitSettings.QueueName,
-                              exchange: _rabbitSettings.ExchangeName,
-                              routingKey: _rabbitSettings.RoutingKey);
+            //var consumerAsync = new AsyncEventingBasicConsumer(_channel);
+            ////_template.AddListener();
 
+            //consumerAsync.Received += async (_, ea) =>
+            //{
+            //    var body = ea.Body.ToArray();
+            //    var message = Encoding.UTF8.GetString(body);
+            //    var order = JsonSerializer.Deserialize<Order>(message);
+            //    await _orderHub.Clients.All.SendAsync("new-order", order);
 
-            var consumerAsync = new AsyncEventingBasicConsumer(_channel);
-            //_template.AddListener();
+            //    _channel.BasicAck(ea.DeliveryTag, false);
+            //};
 
-            consumerAsync.Received += async (_, ea) =>
-            {
-                var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                var order = JsonSerializer.Deserialize<Order>(message);
-                await _orderHub.Clients.All.SendAsync("new-order", order);
-
-                _channel.BasicAck(ea.DeliveryTag, false);
-            };
-
-            _channel.BasicConsume(queue: _rabbitSettings.QueueName,
-                                 autoAck: false,
-                                 consumer: consumerAsync);
+            //_channel.BasicConsume(queue: _rabbitSettings.QueueName,
+            //                     autoAck: false,
+            //                     consumer: consumerAsync);
         }
     }
 }

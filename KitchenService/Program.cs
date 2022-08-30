@@ -20,6 +20,12 @@ builder.Services.AddRabbitTemplate();
 ///--------------
 
 
+
+builder.Services.SetUpRabbitMq(builder.Configuration);
+builder.Services.AddRabbitListeners<RabbitReceiver>();
+builder.Services.AddSingleton<RabbitReceiver>();
+
+
 // Add services to the container.
 
 builder.Services.AddResponseCompression(opts =>
@@ -41,8 +47,7 @@ builder.Services.AddResponseCompression(opts =>
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.SetUpRabbitMq(builder.Configuration);
-builder.Services.AddHostedService<RabbitReceiver>();
+
 
 var app = builder.Build();
 

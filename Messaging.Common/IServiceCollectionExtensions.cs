@@ -25,15 +25,15 @@ public static class IServiceCollectionExtensions
                 }));
         services.AddRabbitExchange(new TopicExchange(settings.ExchangeName, true, true));
         services.AddRabbitBindings(
-            new QueueBinding(settings.BindingName,
-            settings.QueueName, settings.ExchangeName, settings.RoutingKey, null));
+                    new QueueBinding(settings.BindingName,
+                    settings.QueueName, settings.ExchangeName, settings.RoutingKey, null));
 
         //services.AddSingleton<Connection.IConnectionFactory>(sp => new Connection.CachingConnectionFactory
         //{
         //    Host = settings.HostName,
         //    //DispatchConsumersAsync = true
         //});
-        services.AddSingleton<IModel>(sp => sp.GetRabbitConnectionFactory().CreateConnection().CreateChannel());
+        //services.AddSingleton<IModel>(sp => sp.GetRabbitConnectionFactory().CreateConnection().CreateChannel());
         //services.AddSingleton(sp => sp.GetRequiredService<ModelFactory>());
 
 
