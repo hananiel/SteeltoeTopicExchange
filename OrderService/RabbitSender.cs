@@ -29,7 +29,7 @@ public class RabbitSender
        
         _template.ConvertAndSend(exchange: _exchange.ExchangeName,
              routingKey: _rabbitSettings.RoutingKey,
-             message: body);
+             message: message);
         
         Console.WriteLine(" [x] Sent '{0}':'{1}'", key, message);
 

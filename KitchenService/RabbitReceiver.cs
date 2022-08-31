@@ -3,75 +3,46 @@ using Microsoft.AspNetCore.SignalR;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Framing.Impl;
+using Steeltoe.Messaging;
 using Steeltoe.Messaging.RabbitMQ.Attributes;
 using Steeltoe.Messaging.RabbitMQ.Core;
+using Steeltoe.Messaging.RabbitMQ.Listener;
 using System.Text;
 using System.Text.Json;
 
 namespace KitchenService
 {
-    public class RabbitReceiver : IHostedService
+    public class RabbitReceiver :IMessageListener
     {
-        private readonly RabbitMqSettings _rabbitSettings;
-        private readonly IModel _channel;
-        private readonly RabbitTemplate _template;
         private readonly IHubContext<OrderHub> _orderHub;
-        public RabbitReceiver(
-            RabbitMqSettings rabbitSettings,
-            IHubContext<OrderHub> hub,
-            //IModel channel,
-            RabbitTemplate template)
+        public RabbitReceiver(IHubContext<OrderHub> hub)
         {
-            _rabbitSettings = rabbitSettings;
-            //_channel = channel;
             _orderHub = hub;
-            _template = template;
         }
 
+        public AcknowledgeMode ContainerAckMode { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public  Task StartAsync(CancellationToken cancellationToken)
+        public void OnMessage(IMessage message)
         {
-           DoStuff();
-           return Task.CompletedTask;
+            var payload = Encoding.UTF8.GetString((byte[])message.Payload);
+            var order = JsonSerializer.Deserialize<Order>(payload);
+            Task.Run(async () => await(_orderHub.Clients.All.SendAsync("new-order", order)));
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public void OnMessageBatch(List<IMessage> messages)
         {
-            _channel.Dispose();
-            return Task.CompletedTask;
+            foreach (var message in messages)
+            {
+                OnMessage(message);
+            }
         }
 
         //[RabbitListener(Binding = "waffle.binding")]
-        //private async Task Listen(string input)
+        //public async Task ReceiveMessage(string message)
         //{
-        //    var order = JsonSerializer.Deserialize<Order>(input);
+        //    var order = JsonSerializer.Deserialize<Order>(message);
         //    await _orderHub.Clients.All.SendAsync("new-order", order);
+
         //}
-        [RabbitListener(Binding = "waffle.binding")]
-        private void DoStuff()
-        {
-            Console.WriteLine("Success");
-            //_channel.QueueBind(queue: _rabbitSettings.QueueName,
-            //                  exchange: _rabbitSettings.ExchangeName,
-            //                  routingKey: _rabbitSettings.RoutingKey);
-            
-
-            //var consumerAsync = new AsyncEventingBasicConsumer(_channel);
-            ////_template.AddListener();
-
-            //consumerAsync.Received += async (_, ea) =>
-            //{
-            //    var body = ea.Body.ToArray();
-            //    var message = Encoding.UTF8.GetString(body);
-            //    var order = JsonSerializer.Deserialize<Order>(message);
-            //    await _orderHub.Clients.All.SendAsync("new-order", order);
-
-            //    _channel.BasicAck(ea.DeliveryTag, false);
-            //};
-
-            //_channel.BasicConsume(queue: _rabbitSettings.QueueName,
-            //                     autoAck: false,
-            //                     consumer: consumerAsync);
-        }
     }
 }

@@ -1,8 +1,11 @@
 using KitchenService;
 using Messaging;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.SignalR;
+using Steeltoe.Extensions.Configuration;
 using Steeltoe.Messaging.RabbitMQ.Config;
 using Steeltoe.Messaging.RabbitMQ.Extensions;
+using Steeltoe.Messaging.RabbitMQ.Listener;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
@@ -22,8 +25,19 @@ builder.Services.AddRabbitTemplate();
 
 
 builder.Services.SetUpRabbitMq(builder.Configuration);
-builder.Services.AddRabbitListeners<RabbitReceiver>();
+builder.Services.AddRabbitConnectionFactory();
+//builder.Services.AddRabbitListeners<RabbitReceiver>();
 builder.Services.AddSingleton<RabbitReceiver>();
+
+
+builder.Services.AddRabbitDirecListenerContainer("manualContainer", (sp, container) =>
+{
+    var logFactory = sp.GetRequiredService<ILoggerFactory>();
+    container.SetQueueNames("waffle_queue");
+    var hub = sp.GetService<IHubContext<OrderHub>>();
+    container.MessageListener = new RabbitReceiver(hub);
+    container.Initialize();
+});
 
 
 // Add services to the container.
