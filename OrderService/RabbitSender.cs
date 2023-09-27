@@ -25,15 +25,12 @@ public class RabbitSender
 
     public void PublishMessage<T>(T entity, string key) where T : class
     {
-        var messageString = JsonSerializer.Serialize(entity);
-        // var body = Encoding.UTF8.GetBytes(message);
-       // IMessage message = Message.Create(entity);
-        //message
+      
         _template.ConvertAndSend(exchange: _exchange.ExchangeName,
              routingKey: _rabbitSettings.RoutingKey,
              message: entity);
         
-        Console.WriteLine(" [x] Sent '{0}':'{1}'", key, messageString);
+        Console.WriteLine(" [x] Sent '{0}':'{1}'", key, JsonSerializer.Serialize(entity)); 
 
     }
 }

@@ -31,7 +31,7 @@ builder.Services.AddRabbitAdmin();
 builder.Services.AddRabbitTemplate();
 ///--------------
 
-builder.Services.SetUpRabbitMq();
+builder.Services.DeclareQueuesAndBindings();
 builder.Services.AddSingleton<RabbitSender>();
 
 builder.Services.AddEndpointsApiExplorer();

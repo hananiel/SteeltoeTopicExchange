@@ -30,7 +30,7 @@ namespace KitchenService
 
 
       
-        [RabbitListener(Binding = "waffle.binding")]
+        [RabbitListener(Binding = "${RabbitMqSettings:BindingName}")]
         public void DoStuff(Order order)
         {
             Console.WriteLine("Success: Received Order"+ order );
