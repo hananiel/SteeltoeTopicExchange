@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using OrderService;
 using RabbitMQ.Client;
+using Steeltoe.Messaging;
 using Steeltoe.Messaging.RabbitMQ.Config;
 using Steeltoe.Messaging.RabbitMQ.Core;
 using System.Text;
@@ -13,25 +14,26 @@ public class RabbitSender
     private readonly RabbitMqSettings _rabbitSettings;
     private readonly IExchange _exchange;
     public RabbitSender(
-        RabbitMqSettings rabbitSettings, 
+        IOptions<RabbitMqSettings> rabbitSettings, 
         RabbitTemplate template,
         IExchange exchange)
     {
         _template = template;
-        _rabbitSettings = rabbitSettings;
+        _rabbitSettings = rabbitSettings.Value;
         _exchange = exchange;
     }
 
     public void PublishMessage<T>(T entity, string key) where T : class
     {
-        var message = JsonSerializer.Serialize(entity);
-       // var body = Encoding.UTF8.GetBytes(message);
-       
+        var messageString = JsonSerializer.Serialize(entity);
+        // var body = Encoding.UTF8.GetBytes(message);
+       // IMessage message = Message.Create(entity);
+        //message
         _template.ConvertAndSend(exchange: _exchange.ExchangeName,
              routingKey: _rabbitSettings.RoutingKey,
-             message: message);
+             message: entity);
         
-        Console.WriteLine(" [x] Sent '{0}':'{1}'", key, message);
+        Console.WriteLine(" [x] Sent '{0}':'{1}'", key, messageString);
 
     }
 }

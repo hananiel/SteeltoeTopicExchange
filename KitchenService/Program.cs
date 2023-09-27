@@ -1,8 +1,10 @@
 using KitchenService;
 using Messaging;
 using Microsoft.AspNetCore.ResponseCompression;
+using Steeltoe.Extensions.Configuration;
 using Steeltoe.Messaging.RabbitMQ.Config;
 using Steeltoe.Messaging.RabbitMQ.Extensions;
+using Steeltoe.Messaging.RabbitMQ.Support.Converter;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
@@ -11,21 +13,21 @@ builder.Configuration
     .AddUserSecrets<Program>()
     .AddCommandLine(args);
 
-///--------------from steeltoe hostbuilder
+
+
+builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMqSettings"));
+builder.Services.SetUpRabbitMq();
+
 var rabbitConfigSection = builder.Configuration.GetSection(RabbitOptions.PREFIX);
 builder.Services.Configure<RabbitOptions>(rabbitConfigSection);
+
+builder.Services.AddRabbitJsonMessageConverter();
 builder.Services.AddRabbitServices();
 builder.Services.AddRabbitAdmin();
 builder.Services.AddRabbitTemplate();
-///--------------
 
-
-
-builder.Services.SetUpRabbitMq(builder.Configuration);
-builder.Services.AddRabbitListeners<RabbitReceiver>();
 builder.Services.AddSingleton<RabbitReceiver>();
-
-
+builder.Services.AddRabbitListeners<RabbitReceiver>();
 // Add services to the container.
 
 builder.Services.AddResponseCompression(opts =>

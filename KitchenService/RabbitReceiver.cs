@@ -1,5 +1,6 @@
 ﻿using Messaging;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Framing.Impl;
@@ -17,41 +18,23 @@ namespace KitchenService
         private readonly RabbitTemplate _template;
         private readonly IHubContext<OrderHub> _orderHub;
         public RabbitReceiver(
-            RabbitMqSettings rabbitSettings,
+            IOptions<RabbitMqSettings> rabbitSettings,
             IHubContext<OrderHub> hub,
-            //IModel channel,
             RabbitTemplate template)
         {
-            _rabbitSettings = rabbitSettings;
+            _rabbitSettings = rabbitSettings.Value;
             //_channel = channel;
             _orderHub = hub;
             _template = template;
         }
 
 
-        //public  Task StartAsync(CancellationToken cancellationToken)
-        //{
-        //   DoStuff();
-        //   return Task.CompletedTask;
-        //}
-
-        //public Task StopAsync(CancellationToken cancellationToken)
-        //{
-        //    _channel.Dispose();
-        //    return Task.CompletedTask;
-        //}
-
-        //[RabbitListener(Binding = "waffle.binding")]
-        //private async Task Listen(string input)
-        //{
-        //    var order = JsonSerializer.Deserialize<Order>(input);
-        //    await _orderHub.Clients.All.SendAsync("new-order", order);
-        //}
+      
         [RabbitListener(Binding = "waffle.binding")]
-        public void DoStuff(string orderMessage)
+        public void DoStuff(Order order)
         {
-            Console.WriteLine("Success: Received Order"+ orderMessage );
-            var order = JsonSerializer.Deserialize<Order>(orderMessage);
+            Console.WriteLine("Success: Received Order"+ order );
+           // var order = JsonSerializer.Deserialize<Order>(orderMessage);
             _orderHub.Clients.All.SendAsync("new-order", order);
             //_channel.QueueBind(queue: _rabbitSettings.QueueName,
             //                  exchange: _rabbitSettings.ExchangeName,
