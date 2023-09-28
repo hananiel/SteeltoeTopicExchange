@@ -15,18 +15,16 @@ public class RabbitSender
     private readonly IExchange _exchange;
     public RabbitSender(
         IOptions<RabbitMqSettings> rabbitSettings, 
-        RabbitTemplate template,
-        IExchange exchange)
+        RabbitTemplate template)
     {
         _template = template;
         _rabbitSettings = rabbitSettings.Value;
-        _exchange = exchange;
     }
 
     public void PublishMessage<T>(T entity, string key) where T : class
     {
       
-        _template.ConvertAndSend(exchange: _exchange.ExchangeName,
+        _template.ConvertAndSend(exchange: _rabbitSettings.ExchangeName,
              routingKey: _rabbitSettings.RoutingKey,
              message: entity);
         

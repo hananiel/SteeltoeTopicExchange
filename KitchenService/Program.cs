@@ -7,10 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMqSettings"));
 builder.Services.DeclareQueuesAndBindings();
 
-builder.Services.AddRabbitServices(true);
 builder.Services.AddRabbitAdmin();
 builder.Services.AddRabbitTemplate();
 
+builder.Services.AddRabbitServices(true);
 builder.Services.AddSingleton<RabbitReceiver>();
 builder.Services.AddRabbitListeners<RabbitReceiver>();
 
@@ -48,5 +48,4 @@ app.UseRouting();
 app.MapBlazorHub();
 app.MapHub<OrderHub>("/orderhub");
 app.MapFallbackToPage("/_Host");
-
 app.Run();

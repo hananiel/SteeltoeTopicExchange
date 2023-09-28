@@ -21,8 +21,8 @@ public static class IServiceCollectionExtensions
         services.AddRabbitBinding(provider =>
         {
             var settings = provider.GetSettings();
-           return new QueueBinding(settings.BindingName,
-            settings.QueueName, settings.ExchangeName, settings.RoutingKey, null);
+            return new QueueBinding(settings.BindingName,
+             settings.QueueName, settings.ExchangeName, settings.RoutingKey, null);
         });
 
         return services; 
