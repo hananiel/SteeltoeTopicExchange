@@ -1,13 +1,6 @@
 using Messaging;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 using OrderService;
-using Steeltoe.Extensions.Configuration;
-using Steeltoe.Messaging.RabbitMQ.Config;
-using Steeltoe.Messaging.RabbitMQ.Extensions;
-using Steeltoe.Messaging.RabbitMQ.Host;
-using Steeltoe.Messaging.RabbitMQ.Support.Converter;
-using static Steeltoe.Messaging.RabbitMQ.Connection.CorrelationData;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,18 +13,8 @@ builder.Configuration
 
 builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMqSettings"));
 
-//builder.Services.AddRabbitQueues()
-/////--------------from steeltoe hostbuilder
-var rabbitConfigSection = builder.Configuration.GetSection(RabbitOptions.PREFIX);
-builder.Services.Configure<RabbitOptions>(rabbitConfigSection);
+builder.Services.AddSteeltoeMessaging();
 
-builder.Services.AddRabbitJsonMessageConverter();
-builder.Services.AddRabbitServices();
-builder.Services.AddRabbitAdmin();
-builder.Services.AddRabbitTemplate();
-///--------------
-
-builder.Services.DeclareQueuesAndBindings();
 builder.Services.AddSingleton<RabbitSender>();
 
 builder.Services.AddEndpointsApiExplorer();

@@ -5,12 +5,10 @@ using Steeltoe.Messaging.RabbitMQ.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMqSettings"));
+
+builder.Services.AddSteeltoeMessaging();
 builder.Services.DeclareQueuesAndBindings();
 
-builder.Services.AddRabbitAdmin();
-builder.Services.AddRabbitTemplate();
-
-builder.Services.AddRabbitServices(true);
 builder.Services.AddSingleton<RabbitReceiver>();
 builder.Services.AddRabbitListeners<RabbitReceiver>();
 

@@ -13,8 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--<ProjectReference Include="..\..\Steeltoe\src\Messaging\src\RabbitMQ\Steeltoe.Messaging.RabbitMQ.csproj" />-->
-    <ProjectReference Include="..\Messaging.Common\Messaging.csproj" />
+     <ProjectReference Include="..\Messaging.Common\Messaging.csproj" />
   </ItemGroup>
 
 </Project>

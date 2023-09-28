@@ -10,6 +10,13 @@ using Microsoft.Extensions.Options;
 namespace Messaging;
 public static class IServiceCollectionExtensions
 {
+    public static IServiceCollection AddSteeltoeMessaging(this IServiceCollection services)
+    {
+        services.AddRabbitServices(useJsonMessageConverter: true);
+        services.AddRabbitAdmin();
+        services.AddRabbitTemplate();
+        return services;
+    }
 
     public static IServiceCollection DeclareQueuesAndBindings(this IServiceCollection services)//, IConfiguration config)
     {
