@@ -14,15 +14,12 @@ namespace KitchenService
 {
     public class RabbitReceiver 
     {
-      
+
         private readonly IHubContext<OrderHub> _orderHub;
-        public RabbitReceiver(
-            IHubContext<OrderHub> hub,
-            RabbitTemplate template)
+        public RabbitReceiver( IHubContext<OrderHub> hub)
         {
             _orderHub = hub;
         }
-
 
         [RabbitListener(Binding = "${RabbitMqSettings:BindingName}")]
         public void DoStuff(Order order)

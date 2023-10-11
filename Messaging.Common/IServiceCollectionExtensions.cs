@@ -18,7 +18,7 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection DeclareQueuesAndBindings(this IServiceCollection services)//, IConfiguration config)
+    public static IServiceCollection DeclareQueuesAndBindings(this IServiceCollection services)
     {
         services.AddRabbitQueue(provider =>
             new Queue(provider.GetSettings().QueueName, durable: true, exclusive: false, autoDelete: true, new Dictionary<string, object> { { "x-message-ttl", 1000 } }));
