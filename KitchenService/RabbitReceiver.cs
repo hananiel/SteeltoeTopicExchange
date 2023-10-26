@@ -21,7 +21,10 @@ namespace KitchenService
             _orderHub = hub;
         }
 
-        [RabbitListener(Binding = "${RabbitMqSettings:BindingName}")]
+        [DeclareExchange(Name = "${RabbitMqSettings:ExchangeName}", Type= "topic")]
+        [DeclareQueue(Name = "${RabbitMqSettings:QueueName}")]
+        [DeclareQueueBinding(Name = "${RabbitMqSettings:BindingName}", ExchangeName = "${RabbitMqSettings:ExchangeName}", QueueName = "${RabbitMqSettings:QueueName}", RoutingKey = "${RabbitMqSettings:RoutingKey}")]
+        [RabbitListener("${RabbitMqSettings:QueueName}")]
         public void DoStuff(Order order)
         {
             Console.WriteLine("Success: Received Order"+ order );

@@ -12,7 +12,7 @@ public class RabbitSender
 {
     private readonly RabbitTemplate _template;
     private readonly RabbitMqSettings _rabbitSettings;
-    private readonly IExchange _exchange;
+
     public RabbitSender(
         IOptions<RabbitMqSettings> rabbitSettings, 
         RabbitTemplate template)
@@ -23,12 +23,10 @@ public class RabbitSender
 
     public void PublishMessage<T>(T entity, string key) where T : class
     {
-      
         _template.ConvertAndSend(exchange: _rabbitSettings.ExchangeName,
              routingKey: _rabbitSettings.RoutingKey,
              message: entity);
         
         Console.WriteLine(" [x] Sent '{0}':'{1}'", key, JsonSerializer.Serialize(entity)); 
-
     }
 }
